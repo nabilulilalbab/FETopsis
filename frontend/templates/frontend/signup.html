@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+<!---->
+{% block title %} {{ title }} {% endblock title %}
+<!---->
+{% block content %}
+<!---->
+{% include 'navbar.html' %}
+<!---->
+<form method="post">
+  {% if message %}
+  <p class="text-green-600 font-semibold">{{ message }}</p>
+  {% endif %}
+  <!---->
+  {% csrf_token %}
+  <label for="nama_lengkap">Nama Lengkap : </label><br />
+  <input type="text" name="nama_lengkap" id="nama_lengkap" /><br />
+  <label for="email">Email :</label><br />
+  <input type="email" name="email" id="email" /><br />
+  <label for="password">password : </label><br />
+  <input type="password" name="password" id="password" /><br />
+  <label for="password">confirm password : </label><br />
+  <input type="password" name="confirm_password" id="confirm_password" /><br />
+  <input type="submit" value="sign up" />
+</form>
+
+<!---->
+{% include 'footer.html' %}
+<!---->
+{% endblock content %}
