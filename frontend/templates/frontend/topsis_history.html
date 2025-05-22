@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Riwayat perhitungan TOPSIS yang telah dilakukan. Lihat detail dan hasil perhitungan sebelumnya.">
+    <title>{{ title }}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .history-card {
+            transition: transform 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .history-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .calculation-meta {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        .alternatives-count {
+            background-color: #e9ecef;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0">History Perhitungan TOPSIS</h3>
+                        <div>
+                            <a href="{% url 'frontend:topsis_calculate' %}" class="btn btn-primary">Perhitungan Baru</a>
+                            <a href="{% url 'frontend:dashboard' %}" class="btn btn-secondary">Dashboard</a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        {% if error %}
+                        <div class="alert alert-danger">{{ error }}</div>
+                        {% endif %}
+
+                        {% if history %}
+                        <div class="row">
+                            {% for calculation in history %}
+                            <div class="col-md-6 col-lg-4 mb-4">
+                                <div class="card history-card h-100" 
+                                     onclick="window.location.href='{% url 'frontend:topsis_detail' calculation.ID %}'">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ calculation.Name }}</h5>
+                                        
+                                        <div class="calculation-meta mb-3">
+                                            <div class="mb-1">
+                                                <i class="bi bi-calendar"></i>
+                                                <strong>Dibuat:</strong> {{ calculation.CreatedAt|date:"d M Y H:i" }}
+                                            </div>
+                                            <div class="mb-1">
+                                                <i class="bi bi-pencil"></i>
+                                                <strong>Diupdate:</strong> {{ calculation.UpdatedAt|date:"d M Y H:i" }}
+                                            </div>
+                                            <div class="mb-1">
+                                                <strong>ID:</strong> #{{ calculation.ID }}
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <h6>Kriteria ({{ calculation.IdealSolutions|length }}):</h6>
+                                            <div class="d-flex flex-wrap gap-1">
+                                                {% for ideal in calculation.IdealSolutions %}
+                                                <span class="badge bg-primary">{{ ideal.CriteriaName }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <h6>Alternatif:</h6>
+                                            {% for alternative in calculation.Alternatives %}
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <span>{{ alternative.Name }}</span>
+                                                <div>
+                                                    <span class="badge bg-success">Rank {{ alternative.Rank }}</span>
+                                                    <span class="alternatives-count">{{ alternative.ClosenessValue|floatformat:3 }}</span>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+
+                                        <div class="mt-auto">
+                                            <small class="text-muted">Klik untuk melihat detail</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Pagination can be added here if needed -->
+                        {% else %}
+                        <div class="text-center py-5">
+                            <div class="mb-4">
+                                <i class="bi bi-folder-x" style="font-size: 4rem; color: #6c757d;"></i>
+                            </div>
+                            <h4 class="text-muted">Belum Ada History</h4>
+                            <p class="text-muted">Anda belum memiliki perhitungan TOPSIS yang tersimpan.</p>
+                            <a href="{% url 'frontend:topsis_calculate' %}" class="btn btn-primary">
+                                Mulai Perhitungan Pertama
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

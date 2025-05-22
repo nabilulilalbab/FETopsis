@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .criteria-row, .alternative-row {
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background-color: #f8f9fa;
+        }
+        .remove-btn {
+            background-color: #dc3545;
+            border: none;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+        }
+        .add-btn {
+            background-color: #28a745;
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0">TOPSIS Calculator</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if error %}
+                        <div class="alert alert-danger">{{ error }}</div>
+                        {% endif %}
+                        
+                        <form method="post" id="topsis-form">
+                            {% csrf_token %}
+                            
+                            <!-- Criteria Section -->
+                            <div class="mb-4">
+                                <h4>Kriteria</h4>
+                                <div id="criteria-container">
+                                    <div class="criteria-row">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <label class="form-label">Nama Kriteria</label>
+                                                <input type="text" class="form-control" name="criteria_name[]" required>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label">Bobot (0-1)</label>
+                                                <input type="number" class="form-control" name="criteria_weight[]" step="0.01" min="0" max="1" required>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label">Tipe</label>
+                                                <select class="form-control" name="criteria_type[]" required>
+                                                    <option value="benefit">Benefit</option>
+                                                    <option value="cost">Cost</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <label class="form-label">&nbsp;</label>
+                                                <div>
+                                                    <button type="button" class="remove-btn remove-criteria">Hapus</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="add-btn" id="add-criteria">Tambah Kriteria</button>
+                            </div>
+
+                            <!-- Alternatives Section -->
+                            <div class="mb-4">
+                                <h4>Alternatif</h4>
+                                <div id="alternatives-container">
+                                    <div class="alternative-row">
+                                        <div class="row">
+                                            <div class="col-md-10">
+                                                <label class="form-label">Nama Alternatif</label>
+                                                <input type="text" class="form-control" name="alternative_name[]" required>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <label class="form-label">&nbsp;</label>
+                                                <div>
+                                                    <button type="button" class="remove-btn remove-alternative">Hapus</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-2 alternative-values" data-alternative-index="0">
+                                            <!-- Values will be dynamically added here -->
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="add-btn" id="add-alternative">Tambah Alternatif</button>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">Hitung TOPSIS</button>
+                            </div>
+                        </form>
+                        
+                        <div class="mt-3">
+                            <a href="{% url 'frontend:topsis_history' %}" class="btn btn-secondary">Lihat History</a>
+                            <a href="{% url 'frontend:dashboard' %}" class="btn btn-outline-secondary">Kembali ke Dashboard</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let criteriaIndex = 1;
+        let alternativeIndex = 1;
+
+        // Add criteria
+        document.getElementById('add-criteria').addEventListener('click', function() {
+            const container = document.getElementById('criteria-container');
+            const newCriteria = document.createElement('div');
+            newCriteria.className = 'criteria-row';
+            newCriteria.innerHTML = `
+                <div class="row">
+                    <div class="col-md-4">
+                        <label class="form-label">Nama Kriteria</label>
+                        <input type="text" class="form-control" name="criteria_name[]" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Bobot (0-1)</label>
+                        <input type="number" class="form-control" name="criteria_weight[]" step="0.01" min="0" max="1" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Tipe</label>
+                        <select class="form-control" name="criteria_type[]" required>
+                            <option value="benefit">Benefit</option>
+                            <option value="cost">Cost</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">&nbsp;</label>
+                        <div>
+                            <button type="button" class="remove-btn remove-criteria">Hapus</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(newCriteria);
+            updateAlternativeValues();
+        });
+
+        // Add alternative
+        document.getElementById('add-alternative').addEventListener('click', function() {
+            const container = document.getElementById('alternatives-container');
+            const newAlternative = document.createElement('div');
+            newAlternative.className = 'alternative-row';
+            newAlternative.innerHTML = `
+                <div class="row">
+                    <div class="col-md-10">
+                        <label class="form-label">Nama Alternatif</label>
+                        <input type="text" class="form-control" name="alternative_name[]" required>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">&nbsp;</label>
+                        <div>
+                            <button type="button" class="remove-btn remove-alternative">Hapus</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-2 alternative-values" data-alternative-index="${alternativeIndex}">
+                    <!-- Values will be dynamically added here -->
+                </div>
+            `;
+            container.appendChild(newAlternative);
+            alternativeIndex++;
+            updateAlternativeValues();
+        });
+
+        // Remove criteria
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-criteria')) {
+                const criteriaRows = document.querySelectorAll('.criteria-row');
+                if (criteriaRows.length > 1) {
+                    e.target.closest('.criteria-row').remove();
+                    updateAlternativeValues();
+                } else {
+                    alert('Minimal harus ada 1 kriteria');
+                }
+            }
+        });
+
+        // Remove alternative
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-alternative')) {
+                const alternativeRows = document.querySelectorAll('.alternative-row');
+                if (alternativeRows.length > 1) {
+                    e.target.closest('.alternative-row').remove();
+                } else {
+                    alert('Minimal harus ada 1 alternatif');
+                }
+            }
+        });
+
+        // Update alternative values when criteria change
+        function updateAlternativeValues() {
+            const criteriaInputs = document.querySelectorAll('input[name="criteria_name[]"]');
+            const alternativeValues = document.querySelectorAll('.alternative-values');
+            
+            alternativeValues.forEach(function(valueContainer) {
+                const altIndex = valueContainer.getAttribute('data-alternative-index');
+                valueContainer.innerHTML = '';
+                
+                criteriaInputs.forEach(function(criteriaInput, index) {
+                    if (criteriaInput.value.trim()) {
+                        const col = document.createElement('div');
+                        col.className = 'col-md-3 mb-2';
+                        col.innerHTML = `
+                            <label class="form-label">${criteriaInput.value}</label>
+                            <input type="number" class="form-control" name="alternative_${altIndex}_${criteriaInput.value}" step="0.01" required>
+                        `;
+                        valueContainer.appendChild(col);
+                    }
+                });
+            });
+        }
+
+        // Listen for criteria name changes
+        document.addEventListener('input', function(e) {
+            if (e.target.name === 'criteria_name[]') {
+                updateAlternativeValues();
+            }
+        });
+
+        // Initialize alternative values on page load
+        updateAlternativeValues();
+    </script>
+</body>
+</html>
