@@ -1,8 +1,30 @@
-<ul>
-  <li>
-    <a href="{% url 'frontend:signup' %}">Signup</a>
-  </li>
-  <li><a href="{% url 'frontend:login' %}">Login</a></li>
-  <li><a href="#">Logout</a></li>
-  <li></li>
-</ul>
+<nav class="bg-soft border-b-8 border-black shadow-lg">
+  <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+    <ul class="flex space-x-8 font-mono font-extrabold text-black uppercase tracking-wide">
+      {% if is_logged_in %}
+        <li>
+          <form method="POST" action="{% url 'frontend:logout' %}">
+            {% csrf_token %}
+            <button type="submit"
+                    class="border-4 border-black px-4 py-2 rounded hover:bg-red-500 hover:text-white transition duration-150">
+              Logout
+            </button>
+          </form>
+        </li>
+      {% else %}
+        <li>
+          <a href="{% url 'frontend:signup' %}" 
+             class="border-4 border-black px-4 py-2 rounded hover:bg-primary hover:text-white transition duration-150">
+            Signup
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'frontend:login' %}" 
+             class="border-4 border-black px-4 py-2 rounded hover:bg-primary hover:text-white transition duration-150">
+            Login
+          </a>
+        </li>
+      {% endif %}
+    </ul>
+  </div>
+</nav>

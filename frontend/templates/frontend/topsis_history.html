@@ -1,122 +1,75 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Riwayat perhitungan TOPSIS yang telah dilakukan. Lihat detail dan hasil perhitungan sebelumnya.">
-    <title>{{ title }}</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .history-card {
-            transition: transform 0.2s ease-in-out;
-            cursor: pointer;
-        }
-        .history-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        .calculation-meta {
-            font-size: 0.9rem;
-            color: #6c757d;
-        }
-        .alternatives-count {
-            background-color: #e9ecef;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.25rem;
-            font-size: 0.8rem;
-        }
-    </style>
-</head>
-<body>
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h3 class="mb-0">History Perhitungan TOPSIS</h3>
-                        <div>
-                            <a href="{% url 'frontend:topsis_calculate' %}" class="btn btn-primary">Perhitungan Baru</a>
-                            <a href="{% url 'frontend:dashboard' %}" class="btn btn-secondary">Dashboard</a>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        {% if error %}
-                        <div class="alert alert-danger">{{ error }}</div>
-                        {% endif %}
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock title %}
 
-                        {% if history %}
-                        <div class="row">
-                            {% for calculation in history %}
-                            <div class="col-md-6 col-lg-4 mb-4">
-                                <div class="card history-card h-100" 
-                                     onclick="window.location.href='{% url 'frontend:topsis_detail' calculation.ID %}'">
-                                    <div class="card-body">
-                                        <h5 class="card-title">{{ calculation.Name }}</h5>
-                                        
-                                        <div class="calculation-meta mb-3">
-                                            <div class="mb-1">
-                                                <i class="bi bi-calendar"></i>
-                                                <strong>Dibuat:</strong> {{ calculation.CreatedAt|date:"d M Y H:i" }}
-                                            </div>
-                                            <div class="mb-1">
-                                                <i class="bi bi-pencil"></i>
-                                                <strong>Diupdate:</strong> {{ calculation.UpdatedAt|date:"d M Y H:i" }}
-                                            </div>
-                                            <div class="mb-1">
-                                                <strong>ID:</strong> #{{ calculation.ID }}
-                                            </div>
-                                        </div>
+{% block content %}
+{% include 'navbar.html' %}
 
-                                        <div class="mb-3">
-                                            <h6>Kriteria ({{ calculation.IdealSolutions|length }}):</h6>
-                                            <div class="d-flex flex-wrap gap-1">
-                                                {% for ideal in calculation.IdealSolutions %}
-                                                <span class="badge bg-primary">{{ ideal.CriteriaName }}</span>
-                                                {% endfor %}
-                                            </div>
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <h6>Alternatif:</h6>
-                                            {% for alternative in calculation.Alternatives %}
-                                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                                <span>{{ alternative.Name }}</span>
-                                                <div>
-                                                    <span class="badge bg-success">Rank {{ alternative.Rank }}</span>
-                                                    <span class="alternatives-count">{{ alternative.ClosenessValue|floatformat:3 }}</span>
-                                                </div>
-                                            </div>
-                                            {% endfor %}
-                                        </div>
-
-                                        <div class="mt-auto">
-                                            <small class="text-muted">Klik untuk melihat detail</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-
-                        <!-- Pagination can be added here if needed -->
-                        {% else %}
-                        <div class="text-center py-5">
-                            <div class="mb-4">
-                                <i class="bi bi-folder-x" style="font-size: 4rem; color: #6c757d;"></i>
-                            </div>
-                            <h4 class="text-muted">Belum Ada History</h4>
-                            <p class="text-muted">Anda belum memiliki perhitungan TOPSIS yang tersimpan.</p>
-                            <a href="{% url 'frontend:topsis_calculate' %}" class="btn btn-primary">
-                                Mulai Perhitungan Pertama
-                            </a>
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
+  <div class="max-w-6xl mx-auto px-4 py-8">
+    <div class="bg-white border-4 border-black rounded-xl p-6 shadow-xl">
+      <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-extrabold text-primary">History Perhitungan TOPSIS</h1>
+        <div class="space-x-2">
+          <a href="{% url 'frontend:topsis_calculate' %}" class="bg-primary hover:bg-red-700 text-white font-bold py-2 px-4 border-2 border-black rounded">Perhitungan Baru</a>
+          <a href="{% url 'frontend:dashboard' %}" class="bg-secondary hover:bg-yellow-400 text-black font-bold py-2 px-4 border-2 border-black rounded">Dashboard</a>
         </div>
-    </div>
+      </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+      {% if error %}
+      <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">{{ error }}</div>
+      {% endif %}
+
+      {% if history %}
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for calculation in history %}
+        <div onclick="window.location.href='{% url 'frontend:topsis_detail' calculation.ID %}'" class="cursor-pointer p-4 border-2 border-black bg-white rounded-lg shadow hover:shadow-lg transition-transform hover:-translate-y-1">
+          <h2 class="text-xl font-bold mb-2">{{ calculation.Name }}</h2>
+          <div class="text-sm text-gray-700 mb-3">
+            <p><strong>Dibuat:</strong> {{ calculation.CreatedAt|date:"d M Y H:i" }}</p>
+            <p><strong>Diupdate:</strong> {{ calculation.UpdatedAt|date:"d M Y H:i" }}</p>
+            <p><strong>ID:</strong> #{{ calculation.ID }}</p>
+          </div>
+
+          <div class="mb-3">
+            <h3 class="font-semibold">Kriteria ({{ calculation.IdealSolutions|length }}):</h3>
+            <div class="flex flex-wrap gap-1 mt-1">
+              {% for ideal in calculation.IdealSolutions %}
+              <span class="bg-accent text-white px-2 py-1 rounded text-xs font-semibold">{{ ideal.CriteriaName }}</span>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <h3 class="font-semibold">Alternatif:</h3>
+            <div class="space-y-1 mt-1">
+              {% for alternative in calculation.Alternatives %}
+              <div class="flex justify-between text-sm">
+                <span>{{ alternative.Name }}</span>
+                <span>
+                  <span class="bg-tertiary text-white px-2 py-1 rounded text-xs font-bold">Rank {{ alternative.Rank }}</span>
+                  <span class="bg-gray-200 px-2 py-1 rounded text-xs font-mono">{{ alternative.ClosenessValue|floatformat:3 }}</span>
+                </span>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <p class="text-xs text-gray-500 mt-4">Klik untuk melihat detail</p>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="text-center py-12">
+        <div class="mb-4 text-6xl text-gray-400">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6a2 2 0 012-2h2a2 2 0 012 2v6m4 4H5a2 2 0 01-2-2V7a2 2 0 012-2h4l2-2h2l2 2h4a2 2 0 012 2v12a2 2 0 01-2 2z" />
+          </svg>
+        </div>
+        <h4 class="text-xl font-bold text-gray-600">Belum Ada History</h4>
+        <p class="text-gray-500 mb-6">Anda belum memiliki perhitungan TOPSIS yang tersimpan.</p>
+        <a href="{% url 'frontend:topsis_calculate' %}" class="bg-primary hover:bg-red-700 text-white font-bold py-2 px-4 border-2 border-black rounded">Mulai Perhitungan Pertama</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% include 'footer.html' %}
+  {% endblock content %}

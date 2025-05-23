@@ -1,238 +1,193 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }}</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .detail-section {
-            margin-bottom: 2rem;
-        }
-        .criteria-card {
-            border-left: 4px solid #007bff;
-        }
-        .alternative-card {
-            border-left: 4px solid #28a745;
-        }
-        .rank-1 { border-left-color: #ffd700 !important; }
-        .rank-2 { border-left-color: #c0c0c0 !important; }
-        .rank-3 { border-left-color: #cd7f32 !important; }
-        .value-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-        }
-        .value-item {
-            background-color: #f8f9fa;
-            padding: 0.75rem;
-            border-radius: 0.375rem;
-            border: 1px solid #dee2e6;
-        }
-        .calculation-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 2rem;
-            border-radius: 0.5rem;
-            margin-bottom: 2rem;
-        }
-    </style>
-</head>
-<body>
-    <div class="container mt-5">
-        {% if detail %}
-        <!-- Header -->
-        <div class="calculation-header">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h2 class="mb-1">{{ detail.Name }}</h2>
-                    <p class="mb-0 opacity-75">ID Perhitungan: #{{ detail.ID }}</p>
-                </div>
-                <div class="col-md-4 text-md-end">
-                    <div class="mb-1">
-                        <small>Dibuat: {{ detail.CreatedAt|date:"d M Y H:i" }}</small>
-                    </div>
-                    <div>
-                        <small>Diupdate: {{ detail.UpdatedAt|date:"d M Y H:i" }}</small>
-                    </div>
-                </div>
-            </div>
-        </div>
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock title %}
 
-        <!-- Navigation -->
-        <div class="mb-4">
-            <a href="{% url 'frontend:topsis_history' %}" class="btn btn-secondary">
-                ← Kembali ke History
-            </a>
-            <a href="{% url 'frontend:topsis_calculate' %}" class="btn btn-primary">
-                Perhitungan Baru
-            </a>
-        </div>
+{% block content %}
+{% include 'navbar.html' %}
 
-        <!-- Ranking Results -->
-        <div class="detail-section">
-            <h3>Hasil Ranking</h3>
-            <div class="row">
-                {% for alternative in detail.Alternatives|dictsort:"Rank" %}
-                <div class="col-md-6 col-lg-4 mb-3">
-                    <div class="card alternative-card rank-{{ alternative.Rank }}">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h5 class="card-title mb-0">{{ alternative.Name }}</h5>
-                                <span class="badge bg-primary fs-6">Rank {{ alternative.Rank }}</span>
-                            </div>
-                            <div class="mb-2">
-                                <strong class="text-success">Closeness Value:</strong>
-                                <span class="fs-5 fw-bold">{{ alternative.ClosenessValue|floatformat:4 }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
+  <div class="max-w-6xl mx-auto px-6 py-8">
 
-        <!-- Detailed Table -->
-        <div class="detail-section">
-            <h3>Detail Nilai Perhitungan</h3>
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead class="table-dark">
-                        <tr>
-                            <th rowspan="2">Alternatif</th>
-                            <th colspan="{{ detail.IdealSolutions|length }}" class="text-center">Nilai Ternormalisasi Terbobot</th>
-                            <th rowspan="2">Closeness Value</th>
-                            <th rowspan="2">Rank</th>
-                        </tr>
-                        <tr>
-                            {% for ideal in detail.IdealSolutions %}
-                            <th>{{ ideal.CriteriaName }}</th>
-                            {% endfor %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for alternative in detail.Alternatives|dictsort:"Rank" %}
-                        <tr>
-                            <td><strong>{{ alternative.Name }}</strong></td>
-                            {% for criteria in alternative.CriteriaValues %}
-                            <td>{{ criteria.WeightedValue|floatformat:4 }}</td>
-                            {% endfor %}
-                            <td><strong class="text-primary">{{ alternative.ClosenessValue|floatformat:4 }}</strong></td>
-                            <td>
-                                <span class="badge 
-                                    {% if alternative.Rank == 1 %}bg-warning text-dark
-                                    {% elif alternative.Rank == 2 %}bg-secondary
-                                    {% elif alternative.Rank == 3 %}bg-info
-                                    {% else %}bg-light text-dark{% endif %}">
-                                    {{ alternative.Rank }}
-                                </span>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    {% if detail %}
 
-        <!-- Ideal Solutions -->
-        <div class="detail-section">
-            <h3>Solusi Ideal</h3>
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <div class="card criteria-card">
-                        <div class="card-header bg-success text-white">
-                            <h5 class="mb-0">Ideal Positif (A+)</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="value-grid">
-                                {% for ideal in detail.IdealSolutions %}
-                                <div class="value-item">
-                                    <div class="fw-bold">{{ ideal.CriteriaName }}</div>
-                                    <div class="text-primary fs-5">{{ ideal.IdealPositive|floatformat:4 }}</div>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <div class="card criteria-card">
-                        <div class="card-header bg-danger text-white">
-                            <h5 class="mb-0">Ideal Negatif (A-)</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="value-grid">
-                                {% for ideal in detail.IdealSolutions %}
-                                <div class="value-item">
-                                    <div class="fw-bold">{{ ideal.CriteriaName }}</div>
-                                    <div class="text-danger fs-5">{{ ideal.IdealNegative|floatformat:4 }}</div>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <!-- Header -->
+    <div class="bg-primary text-white rounded-xl p-6 mb-8 shadow-lg border-4 border-black">
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <div>
+          <h2 class="text-4xl font-extrabold tracking-tight">{{ detail.Name }}</h2>
+          <p class="opacity-80 mt-1">ID Perhitungan: <span class="font-mono">#{{ detail.ID }}</span></p>
         </div>
-
-        <!-- Detailed Breakdown per Alternative -->
-        <div class="detail-section">
-            <h3>Breakdown per Alternatif</h3>
-            {% for alternative in detail.Alternatives|dictsort:"Rank" %}
-            <div class="card mb-3">
-                <div class="card-header">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">{{ alternative.Name }}</h5>
-                        <div>
-                            <span class="badge bg-primary me-2">Rank {{ alternative.Rank }}</span>
-                            <span class="badge bg-success">{{ alternative.ClosenessValue|floatformat:4 }}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6>Nilai Ternormalisasi</h6>
-                            <div class="value-grid">
-                                {% for criteria in alternative.CriteriaValues %}
-                                <div class="value-item">
-                                    <div class="fw-bold">{{ criteria.CriteriaName }}</div>
-                                    <div class="text-info">{{ criteria.NormalizedValue|floatformat:4 }}</div>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <h6>Nilai Ternormalisasi Terbobot</h6>
-                            <div class="value-grid">
-                                {% for criteria in alternative.CriteriaValues %}
-                                <div class="value-item">
-                                    <div class="fw-bold">{{ criteria.CriteriaName }}</div>
-                                    <div class="text-primary">{{ criteria.WeightedValue|floatformat:4 }}</div>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
+        <div class="text-right mt-4 md:mt-0 text-sm space-y-1">
+          <p>Dibuat: <span class="font-mono">{{ detail.CreatedAt|date:"d M Y H:i" }}</span></p>
+          <p>Diupdate: <span class="font-mono">{{ detail.UpdatedAt|date:"d M Y H:i" }}</span></p>
         </div>
-
-        {% else %}
-        <div class="text-center py-5">
-            <div class="alert alert-warning">
-                {% if error %}
-                    {{ error }}
-                {% else %}
-                    Data perhitungan tidak ditemukan.
-                {% endif %}
-            </div>
-            <a href="{% url 'frontend:topsis_history' %}" class="btn btn-secondary">Kembali ke History</a>
-        </div>
-        {% endif %}
+      </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+    <!-- Navigation -->
+    <div class="flex justify-between mb-8">
+      <a href="{% url 'frontend:topsis_history' %}" class="border-4 border-black bg-secondary hover:bg-yellow-400 text-black font-bold px-5 py-3 rounded-lg shadow-md">← Kembali ke History</a>
+      <a href="{% url 'frontend:topsis_calculate' %}" class="border-4 border-black bg-tertiary hover:bg-green-600 text-white font-bold px-5 py-3 rounded-lg shadow-md">Perhitungan Baru</a>
+    </div>
+
+    <!-- Ranking Results -->
+    <section class="mb-12">
+      <h3 class="text-3xl font-extrabold mb-6 text-accent border-b-4 border-accent pb-2">Hasil Ranking</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {% for alternative in detail.Alternatives|dictsort:"Rank" %}
+        <div class="border-4 border-black rounded-xl p-5 bg-white shadow-lg
+          {% if alternative.Rank == 1 %} border-yellow-400 bg-yellow-100
+          {% elif alternative.Rank == 2 %} border-gray-400 bg-gray-100
+          {% elif alternative.Rank == 3 %} border-yellow-700 bg-yellow-200
+          {% else %} border-primary bg-soft {% endif %}">
+          <div class="flex justify-between items-center mb-3">
+            <h4 class="text-xl font-bold text-primary">{{ alternative.Name }}</h4>
+            <span class="text-lg font-extrabold px-3 py-1 rounded border-2 border-black
+              {% if alternative.Rank == 1 %} bg-yellow-400 text-black
+              {% elif alternative.Rank == 2 %} bg-gray-400 text-black
+              {% elif alternative.Rank == 3 %} bg-yellow-700 text-white
+              {% else %} bg-primary text-white {% endif %}">
+              Rank {{ alternative.Rank }}
+            </span>
+          </div>
+          <p><strong class="text-tertiary">Closeness Value:</strong> <span class="text-2xl font-extrabold">{{ alternative.ClosenessValue|floatformat:4 }}</span></p>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- Detailed Table -->
+    <section class="mb-12">
+      <h3 class="text-3xl font-extrabold mb-6 text-accent border-b-4 border-accent pb-2">Detail Nilai Perhitungan</h3>
+      <div class="overflow-x-auto border-4 border-black rounded-xl shadow-lg">
+        <table class="w-full border-collapse border-black text-left">
+          <thead class="bg-primary text-white border-b-4 border-black">
+            <tr>
+              <th rowspan="2" class="border-r-4 border-black px-4 py-3">Alternatif</th>
+              <th colspan="{{ detail.IdealSolutions|length }}" class="text-center border-r-4 border-black px-4 py-3">Nilai Ternormalisasi Terbobot</th>
+              <th rowspan="2" class="border-r-4 border-black px-4 py-3">Closeness Value</th>
+              <th rowspan="2" class="px-4 py-3">Rank</th>
+            </tr>
+            <tr>
+              {% for ideal in detail.IdealSolutions %}
+              <th class="border-r-4 border-black px-4 py-2">{{ ideal.CriteriaName }}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for alternative in detail.Alternatives|dictsort:"Rank" %}
+            <tr class="bg-white border-b-4 border-black hover:bg-soft">
+              <td class="font-bold border-r-4 border-black px-4 py-2">{{ alternative.Name }}</td>
+              {% for criteria in alternative.CriteriaValues %}
+              <td class="border-r-4 border-black px-4 py-2">{{ criteria.WeightedValue|floatformat:4 }}</td>
+              {% endfor %}
+              <td class="font-bold text-primary border-r-4 border-black px-4 py-2">{{ alternative.ClosenessValue|floatformat:4 }}</td>
+              <td class="px-4 py-2">
+                <span class="font-bold px-3 py-1 rounded border-2 border-black
+                  {% if alternative.Rank == 1 %} bg-yellow-400 text-black
+                  {% elif alternative.Rank == 2 %} bg-gray-400 text-black
+                  {% elif alternative.Rank == 3 %} bg-yellow-700 text-white
+                  {% else %} bg-primary text-white {% endif %}">
+                  {{ alternative.Rank }}
+                </span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Ideal Solutions -->
+    <section class="mb-12">
+      <h3 class="text-3xl font-extrabold mb-6 text-accent border-b-4 border-accent pb-2">Solusi Ideal</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="border-4 border-black rounded-xl p-5 bg-white shadow-lg">
+          <div class="bg-tertiary text-white font-bold rounded-t px-4 py-3 mb-4 border-b-4 border-black">Ideal Positif (A+)</div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {% for ideal in detail.IdealSolutions %}
+            <div class="bg-soft border-2 border-black rounded p-3">
+              <div class="font-extrabold text-primary">{{ ideal.CriteriaName }}</div>
+              <div class="text-2xl text-blue-700 font-bold">{{ ideal.IdealPositive|floatformat:4 }}</div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="border-4 border-black rounded-xl p-5 bg-white shadow-lg">
+          <div class="bg-primary text-white font-bold rounded-t px-4 py-3 mb-4 border-b-4 border-black">Ideal Negatif (A-)</div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {% for ideal in detail.IdealSolutions %}
+            <div class="bg-soft border-2 border-black rounded p-3">
+              <div class="font-extrabold text-primary">{{ ideal.CriteriaName }}</div>
+              <div class="text-2xl text-red-600 font-bold">{{ ideal.IdealNegative|floatformat:4 }}</div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Detailed Breakdown per Alternative -->
+    <section class="mb-12">
+      <h3 class="text-3xl font-extrabold mb-6 text-accent border-b-4 border-accent pb-2">Breakdown per Alternatif</h3>
+      {% for alternative in detail.Alternatives|dictsort:"Rank" %}
+      <div class="border-4 border-black rounded-xl mb-6 bg-white shadow-lg">
+        <div class="bg-secondary text-black font-extrabold px-6 py-3 border-b-4 border-black flex justify-between items-center">
+          <h4>{{ alternative.Name }}</h4>
+          <div class="flex space-x-3">
+            <span class="px-4 py-1 rounded border-2 border-black
+              {% if alternative.Rank == 1 %} bg-yellow-400 text-black
+              {% elif alternative.Rank == 2 %} bg-gray-400 text-black
+              {% elif alternative.Rank == 3 %} bg-yellow-700 text-white
+              {% else %} bg-primary text-white {% endif %}">
+              Rank {{ alternative.Rank }}
+            </span>
+            <span class="px-4 py-1 rounded border-2 border-black bg-tertiary text-white font-bold">{{ alternative.ClosenessValue|floatformat:4 }}</span>
+          </div>
+        </div>
+        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div>
+            <h5 class="font-extrabold mb-4 text-accent">Nilai Ternormalisasi</h5>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {% for criteria in alternative.CriteriaValues %}
+              <div class="bg-soft border-2 border-black rounded p-3">
+                <div class="font-bold text-primary">{{ criteria.CriteriaName }}</div>
+                <div class="text-blue-600 text-xl font-semibold">{{ criteria.NormalizedValue|floatformat:4 }}</div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          <div>
+            <h5 class="font-extrabold mb-4 text-accent">Nilai Ternormalisasi Terbobot</h5>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {% for criteria in alternative.CriteriaValues %}
+              <div class="bg-soft border-2 border-black rounded p-3">
+                <div class="font-bold text-primary">{{ criteria.CriteriaName }}</div>
+                <div class="text-primary text-xl font-semibold">{{ criteria.WeightedValue|floatformat:4 }}</div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </section>
+
+    {% else %}
+    <div class="text-center py-20">
+      <div class="bg-yellow-100 border-4 border-yellow-400 text-yellow-900 font-bold inline-block px-6 py-4 rounded-lg">
+        {% if error %}
+          {{ error }}
+        {% else %}
+          Data perhitungan tidak ditemukan.
+        {% endif %}
+      </div>
+      <div class="mt-6">
+        <a href="{% url 'frontend:topsis_history' %}" class="border-4 border-black bg-secondary hover:bg-yellow-400 text-black font-bold px-6 py-3 rounded-lg shadow-md inline-block">Kembali ke History</a>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+
+  {% include 'footer.html' %}
+  {% endblock content %}

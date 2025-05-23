@@ -1,223 +1,166 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }}</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .feature-card {
-            transition: transform 0.2s ease-in-out;
-            height: 100%;
-        }
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-        }
-        .feature-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-        .dashboard-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 3rem 0;
-            margin-bottom: 3rem;
-        }
-    </style>
-</head>
-<body>
-    <!-- Header -->
-    <div class="dashboard-header">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h1 class="display-4 mb-2">Dashboard TOPSIS</h1>
-                    <p class="lead mb-0">Sistem Pendukung Keputusan dengan Metode TOPSIS</p>
-                </div>
-                <div class="col-md-4 text-md-end">
-                    <a href="{% url 'frontend:logout' %}" class="btn btn-outline-light">Logout</a>
-                </div>
-            </div>
-        </div>
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock title %}
+
+{% block content %}
+{% include 'navbar.html' %}
+  <!-- Header -->
+  <header class="bg-gradient-to-br from-indigo-500 via-purple-600 to-purple-800 text-white py-16 mb-12">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between">
+      <div class="md:w-2/3">
+        <h1 class="text-4xl font-extrabold mb-2">Dashboard TOPSIS</h1>
+        <p class="text-lg font-medium">Sistem Pendukung Keputusan dengan Metode TOPSIS</p>
+      </div>
+      {% comment %} <div class="mt-6 md:mt-0">
+        <a href="{% url 'frontend:logout' %}" class="inline-block px-5 py-3 border border-white rounded-lg font-semibold hover:bg-white hover:text-purple-800 transition">Logout</a>
+      </div> {% endcomment %}
     </div>
+  </header>
 
-    <div class="container">
-        <!-- Main Features -->
-        <div class="row g-4 mb-5">
-            <div class="col-md-4">
-                <div class="card feature-card text-center">
-                    <div class="card-body p-4">
-                        <div class="feature-icon text-primary">
-                            📊
-                        </div>
-                        <h4 class="card-title">Perhitungan TOPSIS</h4>
-                        <p class="card-text">Lakukan perhitungan metode TOPSIS untuk mendukung pengambilan keputusan dengan multiple criteria.</p>
-                        <a href="{% url 'frontend:topsis_calculate' %}" class="btn btn-primary">Mulai Perhitungan</a>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-md-4">
-                <div class="card feature-card text-center">
-                    <div class="card-body p-4">
-                        <div class="feature-icon text-success">
-                            📈
-                        </div>
-                        <h4 class="card-title">History Perhitungan</h4>
-                        <p class="card-text">Lihat semua perhitungan TOPSIS yang telah Anda simpan sebelumnya dan analisis hasilnya.</p>
-                        <a href="{% url 'frontend:topsis_history' %}" class="btn btn-success">Lihat History</a>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-md-4">
-                <div class="card feature-card text-center">
-                    <div class="card-body p-4">
-                        <div class="feature-icon text-info">
-                            📋
-                        </div>
-                        <h4 class="card-title">Tutorial TOPSIS</h4>
-                        <p class="card-text">Pelajari cara menggunakan metode TOPSIS dan memahami hasil perhitungan dengan benar.</p>
-                        <a href="#" class="btn btn-info" onclick="showTutorial()">Lihat Tutorial</a>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <main class="max-w-7xl mx-auto px-6">
 
-        <!-- Quick Stats -->
-        <div class="row g-4 mb-5">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">Tentang Metode TOPSIS</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <p><strong>TOPSIS (Technique for Order of Preference by Similarity to Ideal Solution)</strong> adalah metode pengambilan keputusan multikriteria yang dikembangkan oleh Hwang dan Yoon pada tahun 1981.</p>
-                                
-                                <h6>Keunggulan TOPSIS:</h6>
-                                <ul>
-                                    <li>Konsep sederhana dan mudah dipahami</li>
-                                    <li>Komputasi yang efisien</li>
-                                    <li>Mampu mengukur kinerja relatif dari alternatif-alternatif keputusan</li>
-                                    <li>Hasil yang konsisten dan stabil</li>
-                                </ul>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card bg-light">
-                                    <div class="card-body text-center">
-                                        <h5>Langkah TOPSIS</h5>
-                                        <ol class="text-start">
-                                            <li>Normalisasi matriks keputusan</li>
-                                            <li>Pembobotan matriks ternormalisasi</li>
-                                            <li>Menentukan solusi ideal positif dan negatif</li>
-                                            <li>Menghitung jarak terhadap solusi ideal</li>
-                                            <li>Menghitung nilai kedekatan relatif</li>
-                                            <li>Merangking alternatif</li>
-                                        </ol>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <!-- Main Features -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+      <!-- Card 1 -->
+      <div class="feature-card bg-white rounded-xl p-8 text-center shadow-lg cursor-pointer">
+        <div class="text-primary text-6xl mb-6 select-none">📊</div>
+        <h2 class="text-2xl font-bold mb-3">Perhitungan TOPSIS</h2>
+        <p class="mb-6 text-gray-700">Lakukan perhitungan metode TOPSIS untuk mendukung pengambilan keputusan dengan multiple criteria.</p>
+        <a href="{% url 'frontend:topsis_calculate' %}" class="inline-block px-6 py-3 bg-primary text-white font-semibold rounded-lg border-2 border-black hover:bg-red-700 transition">Mulai Perhitungan</a>
+      </div>
 
-        <!-- Quick Actions -->
-        <div class="row g-4">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0">Quick Start</h5>
-                    </div>
-                    <div class="card-body">
-                        <p>Mulai perhitungan TOPSIS Anda dengan langkah-langkah berikut:</p>
-                        <ol>
-                            <li>Klik "Mulai Perhitungan"</li>
-                            <li>Masukkan kriteria dan bobotnya</li>
-                            <li>Masukkan alternatif dan nilainya</li>
-                            <li>Lihat hasil ranking</li>
-                            <li>Simpan hasil jika diperlukan</li>
-                        </ol>
-                        <a href="{% url 'frontend:topsis_calculate' %}" class="btn btn-primary">Mulai Sekarang</a>
-                    </div>
-                </div>
+      <!-- Card 2 -->
+      <div class="feature-card bg-white rounded-xl p-8 text-center shadow-lg cursor-pointer">
+        <div class="text-tertiary text-6xl mb-6 select-none">📈</div>
+        <h2 class="text-2xl font-bold mb-3">History Perhitungan</h2>
+        <p class="mb-6 text-gray-700">Lihat semua perhitungan TOPSIS yang telah Anda simpan sebelumnya dan analisis hasilnya.</p>
+        <a href="{% url 'frontend:topsis_history' %}" class="inline-block px-6 py-3 bg-tertiary text-white font-semibold rounded-lg border-2 border-black hover:bg-green-700 transition">Lihat History</a>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="feature-card bg-white rounded-xl p-8 text-center shadow-lg cursor-pointer">
+        <div class="text-accent text-6xl mb-6 select-none">📋</div>
+        <h2 class="text-2xl font-bold mb-3">Tutorial TOPSIS</h2>
+        <p class="mb-6 text-gray-700">Pelajari cara menggunakan metode TOPSIS dan memahami hasil perhitungan dengan benar.</p>
+        <button onclick="showTutorial()" class="inline-block px-6 py-3 bg-accent text-white font-semibold rounded-lg border-2 border-black hover:bg-blue-700 transition">Lihat Tutorial</button>
+      </div>
+    </section>
+
+    <!-- Tentang TOPSIS -->
+    <section class="mb-12">
+      <div class="bg-white rounded-xl shadow-lg p-8">
+        <h3 class="text-xl font-bold mb-6 border-b-4 border-primary pb-2">Tentang Metode TOPSIS</h3>
+        <div class="md:flex md:gap-8">
+          <div class="md:flex-1">
+            <p class="mb-4"><strong>TOPSIS (Technique for Order of Preference by Similarity to Ideal Solution)</strong> adalah metode pengambilan keputusan multikriteria yang dikembangkan oleh Hwang dan Yoon pada tahun 1981.</p>
+            <h4 class="font-semibold mb-2">Keunggulan TOPSIS:</h4>
+            <ul class="list-disc list-inside text-gray-700 space-y-1">
+              <li>Konsep sederhana dan mudah dipahami</li>
+              <li>Komputasi yang efisien</li>
+              <li>Mampu mengukur kinerja relatif dari alternatif-alternatif keputusan</li>
+              <li>Hasil yang konsisten dan stabil</li>
+            </ul>
+          </div>
+          <div class="md:flex-1 mt-8 md:mt-0">
+            <div class="bg-gray-100 rounded-lg p-6 shadow-inner">
+              <h4 class="font-semibold mb-3 text-center">Langkah TOPSIS</h4>
+              <ol class="list-decimal list-inside space-y-1 text-gray-700">
+                <li>Normalisasi matriks keputusan</li>
+                <li>Pembobotan matriks ternormalisasi</li>
+                <li>Menentukan solusi ideal positif dan negatif</li>
+                <li>Menghitung jarak terhadap solusi ideal</li>
+                <li>Menghitung nilai kedekatan relatif</li>
+                <li>Merangking alternatif</li>
+              </ol>
             </div>
-            
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header bg-success text-white">
-                        <h5 class="mb-0">Tips & Tricks</h5>
-                    </div>
-                    <div class="card-body">
-                        <ul class="mb-3">
-                            <li>Pastikan total bobot kriteria = 1.0</li>
-                            <li>Pilih tipe kriteria dengan benar (benefit/cost)</li>
-                            <li>Berikan nama yang jelas untuk setiap perhitungan</li>
-                            <li>Simpan hasil penting untuk referensi masa depan</li>
-                            <li>Bandingkan hasil antar alternatif dengan hati-hati</li>
-                        </ul>
-                        <a href="{% url 'frontend:topsis_history' %}" class="btn btn-success">Lihat History</a>
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
+      </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+      <div class="bg-white rounded-xl shadow-lg">
+        <div class="bg-primary text-white font-semibold rounded-t-xl px-6 py-4">
+          Quick Start
+        </div>
+        <div class="p-6 text-gray-700">
+          <p class="mb-4">Mulai perhitungan TOPSIS Anda dengan langkah-langkah berikut:</p>
+          <ol class="list-decimal list-inside space-y-1 mb-6">
+            <li>Klik "Mulai Perhitungan"</li>
+            <li>Masukkan kriteria dan bobotnya</li>
+            <li>Masukkan alternatif dan nilainya</li>
+            <li>Lihat hasil ranking</li>
+            <li>Simpan hasil jika diperlukan</li>
+          </ol>
+          <a href="{% url 'frontend:topsis_calculate' %}" class="inline-block px-6 py-3 bg-primary text-white font-semibold rounded-lg border-2 border-black hover:bg-red-700 transition">Mulai Sekarang</a>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-lg">
+        <div class="bg-tertiary text-white font-semibold rounded-t-xl px-6 py-4">
+          Tips & Tricks
+        </div>
+        <div class="p-6 text-gray-700">
+          <ul class="mb-6 list-disc list-inside space-y-1">
+            <li>Pastikan total bobot kriteria = 1.0</li>
+            <li>Pilih tipe kriteria dengan benar (benefit/cost)</li>
+            <li>Berikan nama yang jelas untuk setiap perhitungan</li>
+            <li>Simpan hasil penting untuk referensi masa depan</li>
+            <li>Bandingkan hasil antar alternatif dengan hati-hati</li>
+          </ul>
+          <a href="{% url 'frontend:topsis_history' %}" class="inline-block px-6 py-3 bg-tertiary text-white font-semibold rounded-lg border-2 border-black hover:bg-green-700 transition">Lihat History</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Tutorial Modal -->
+  <div id="tutorialModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-auto shadow-lg relative">
+      <div class="flex justify-between items-center border-b border-gray-200 p-4">
+        <h5 class="text-lg font-bold">Tutorial TOPSIS</h5>
+        <button onclick="closeTutorial()" class="text-gray-600 hover:text-gray-900 font-bold text-xl leading-none">&times;</button>
+      </div>
+      <div class="p-6 space-y-4 text-gray-800">
+        <h6 class="font-semibold">Langkah 1: Persiapan Data</h6>
+        <p>Siapkan kriteria-kriteria yang akan digunakan beserta bobotnya. Total bobot harus sama dengan 1.0.</p>
+
+        <h6 class="font-semibold">Langkah 2: Input Alternatif</h6>
+        <p>Masukkan alternatif-alternatif yang akan dibandingkan beserta nilai untuk setiap kriteria.</p>
+
+        <h6 class="font-semibold">Langkah 3: Pilih Tipe Kriteria</h6>
+        <p><strong>Benefit:</strong> Semakin tinggi nilai semakin baik (contoh: kualitas, kecepatan)<br />
+           <strong>Cost:</strong> Semakin rendah nilai semakin baik (contoh: biaya, waktu tempuh)</p>
+
+        <h6 class="font-semibold">Langkah 4: Perhitungan Otomatis</h6>
+        <p>Sistem akan melakukan perhitungan secara otomatis menggunakan metode TOPSIS berdasarkan input yang diberikan.</p>
+
+        <h6 class="font-semibold">Langkah 5: Interpretasi Hasil</h6>
+        <p>Hasil akan menampilkan ranking dari alternatif-alternatif terbaik hingga terendah berdasarkan kedekatan terhadap solusi ideal.</p>
+
+        <h6 class="font-semibold">Langkah 6: Simpan atau Cetak</h6>
+        <p>Anda dapat menyimpan hasil perhitungan atau mencetaknya untuk dokumentasi dan referensi.</p>
+      </div>
+      <div class="flex justify-end border-t border-gray-200 p-4">
+        <button onclick="closeTutorial()" class="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded font-semibold">Tutup</button>
+      </div>
     </div>
+  </div>
 
-    <!-- Tutorial Modal -->
-    <div class="modal fade" id="tutorialModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Tutorial TOPSIS</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <h6>Langkah 1: Persiapan Data</h6>
-                    <p>Siapkan kriteria-kriteria yang akan digunakan beserta bobotnya. Total bobot harus sama dengan 1.0.</p>
-                    
-                    <h6>Langkah 2: Input Alternatif</h6>
-                    <p>Masukkan alternatif-alternatif yang akan dibandingkan beserta nilai untuk setiap kriteria.</p>
-                    
-                    <h6>Langkah 3: Pilih Tipe Kriteria</h6>
-                    <p><strong>Benefit:</strong> Semakin tinggi nilai semakin baik (contoh: kualitas, kecepatan)<br>
-                    <strong>Cost:</strong>
-                                        Semakin rendah nilai semakin baik (contoh: biaya, waktu tempuh)</p>
-                    
-                    <h6>Langkah 4: Perhitungan Otomatis</h6>
-                    <p>Sistem akan melakukan perhitungan secara otomatis menggunakan metode TOPSIS berdasarkan input yang diberikan.</p>
+  <!-- Footer -->
+  <footer class="bg-white text-center py-6 mt-12 border-t border-gray-300 text-gray-700 text-sm">
+    <p>&copy; {{ current_year }} Sistem Pendukung Keputusan TOPSIS. Dibuat dengan ❤️ untuk kemudahan pengambilan keputusan.</p>
+  </footer>
 
-                    <h6>Langkah 5: Interpretasi Hasil</h6>
-                    <p>Hasil akan menampilkan ranking dari alternatif-alternatif terbaik hingga terendah berdasarkan kedekatan terhadap solusi ideal.</p>
+  <script>
+    function showTutorial() {
+      document.getElementById('tutorialModal').classList.remove('hidden');
+    }
+    function closeTutorial() {
+      document.getElementById('tutorialModal').classList.add('hidden');
+    }
+  </script>
 
-                    <h6>Langkah 6: Simpan atau Cetak</h6>
-                    <p>Anda dapat menyimpan hasil perhitungan atau mencetaknya untuk dokumentasi dan referensi.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <footer class="bg-light text-center py-4 mt-5">
-        <div class="container">
-            <p class="mb-0">&copy; {{ current_year }} Sistem Pendukung Keputusan TOPSIS. Dibuat dengan ❤️ untuk kemudahan pengambilan keputusan.</p>
-        </div>
-    </footer>
-
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function showTutorial() {
-            var tutorialModal = new bootstrap.Modal(document.getElementById('tutorialModal'));
-            tutorialModal.show();
-        }
-    </script>
-</body>
-</html>
-
+  {% include 'footer.html' %}
+  {% endblock content %}

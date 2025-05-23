@@ -4,10 +4,14 @@ from django.utils.http import datetime
 import requests
 import json
 
+def is_logged_in(request):
+    return bool(request.session.get('token'))
+
 # Create your views here.
 def index(request):
     return render(request,'frontend/index.html',context={
-        'year' : datetime.datetime.now().year,
+        'year': datetime.datetime.now().year,
+        'is_logged_in': is_logged_in(request),
         'title' : 'Topsis Home',
         })
 
@@ -15,7 +19,9 @@ def dashboard(request):
     if not request.session.get('token'):
         return redirect('frontend:login')
     return render(request, 'frontend/dashboard.html', context={
-        'title' : 'dashboard'
+        'title' : 'dashboard',
+        'year': datetime.datetime.now().year,
+        'is_logged_in': is_logged_in(request)
         })
 
 def signup(request):
@@ -43,11 +49,15 @@ def signup(request):
             message = f'terjadi Error{e}'
         return render(request, 'frontend/signup.html', context={
             'title' : 'signup',
-            'message' : message
+            'message' : message,
+            'year': datetime.datetime.now().year,
+            'is_logged_in': is_logged_in(request)
             })
     else:
         return render(request, 'frontend/signup.html', context={
             'title' : 'signup',
+            'year': datetime.datetime.now().year,
+        'is_logged_in': is_logged_in(request)
             })
 
 def login(request):
@@ -81,9 +91,13 @@ def login(request):
         return render(request, 'frontend/login.html', context={
             'title' : 'login',
             'message' : message,
+            'year': datetime.datetime.now().year,
+            'is_logged_in': is_logged_in(request)
             })
     return render(request, 'frontend/login.html', context={
-        'title' : 'login'
+        'title' : 'login',
+        'year': datetime.datetime.now().year,
+        'is_logged_in': is_logged_in(request)
         })
 
 def logout(request):
@@ -158,24 +172,32 @@ def topsis_calculate(request):
                     'title': 'TOPSIS Result',
                     'result': result_data,
                     'original_criteria': criteria,
-                    'original_alternatives': alternatives
+                    'original_alternatives': alternatives,
+                    'year': datetime.datetime.now().year,
+                    'is_logged_in': is_logged_in(request)
                 })
             else:
                 error_message = f'Error calculating TOPSIS: {response.status_code}'
                 return render(request, 'frontend/topsis.html', {
                     'title': 'TOPSIS Calculator',
-                    'error': error_message
+                    'error': error_message,
+                    'year': datetime.datetime.now().year,
+            'is_logged_in': is_logged_in(request)
                 })
                 
         except Exception as e:
             error_message = f'Error: {str(e)}'
             return render(request, 'frontend/topsis.html', {
                 'title': 'TOPSIS Calculator',
-                'error': error_message
+                'error': error_message,
+                'year': datetime.datetime.now().year,
+            'is_logged_in': is_logged_in(request)
             })
     
     return render(request, 'frontend/topsis.html', {
-        'title': 'TOPSIS Calculator'
+        'title': 'TOPSIS Calculator',
+        'year': datetime.datetime.now().year,
+        'is_logged_in': is_logged_in(request)
     })
 
 def topsis_save(request):
@@ -243,14 +265,18 @@ def topsis_history(request):
             history_data = response.json()
             return render(request, 'frontend/topsis_history.html', {
                 'title': 'TOPSIS History',
-                'history': history_data.get('data', [])
+                'history': history_data.get('data', []),
+                'year': datetime.datetime.now().year,
+                'is_logged_in': is_logged_in(request)
             })
         else:
             error_message = f'Error fetching history: {response.status_code}'
             return render(request, 'frontend/topsis_history.html', {
                 'title': 'TOPSIS History',
                 'error': error_message,
-                'history': []
+                'history': [],
+                'year': datetime.datetime.now().year,
+                'is_logged_in': is_logged_in(request)
             })
             
     except Exception as e:
@@ -258,7 +284,9 @@ def topsis_history(request):
         return render(request, 'frontend/topsis_history.html', {
             'title': 'TOPSIS History',
             'error': error_message,
-            'history': []
+            'history': [],
+            'year': datetime.datetime.now().year,
+            'is_logged_in': is_logged_in(request)
         })
 
 def topsis_detail(request, calculation_id):
@@ -279,14 +307,18 @@ def topsis_detail(request, calculation_id):
             detail_data = response.json()
             return render(request, 'frontend/topsis_detail.html', {
                 'title': 'TOPSIS Detail',
-                'detail': detail_data.get('data', {})
+                'detail': detail_data.get('data', {}),
+                'year': datetime.datetime.now().year,
+                'is_logged_in': is_logged_in(request)
             })
         else:
             error_message = f'Error fetching detail: {response.status_code}'
             return render(request, 'frontend/topsis_detail.html', {
                 'title': 'TOPSIS Detail',
                 'error': error_message,
-                'detail': {}
+                'detail': {},
+                'year': datetime.datetime.now().year,
+                'is_logged_in': is_logged_in(request)
             })
             
     except Exception as e:
@@ -294,5 +326,9 @@ def topsis_detail(request, calculation_id):
         return render(request, 'frontend/topsis_detail.html', {
             'title': 'TOPSIS Detail',
             'error': error_message,
-            'detail': {}
+            'detail': {},
+            'year': datetime.datetime.now().year,
+        'is_logged_in': is_logged_in(request)
         })
+
+
