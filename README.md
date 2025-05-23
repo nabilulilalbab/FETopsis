@@ -85,7 +85,7 @@ Metode TOPSIS adalah teknik pengambilan keputusan multikriteria yang memilih alt
 6. Merangking alternatif
 
 ## Credits
-- Dibuat oleh: [Nama Anda/Tim]
+- Dibuat oleh: Nabil Ulil Albab
 - Framework: Django 4.2.3
 - Template UI: TailwindCSS (melalui CDN)
 
